@@ -25,4 +25,5 @@ logs
 
 #IDE Settings
 .vscode/
-settings.json*.tar.gz
+settings.json
+*.tar.gz
