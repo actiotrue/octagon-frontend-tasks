@@ -187,93 +187,11 @@ export function hasActiveFilters(filters: RequestFilters): boolean {
   )
 }
 
-export function filterRequests(
-  requests: SupportRequest[],
-  filters: RequestFilters,
-): SupportRequest[] {
-  const query = filters.q.trim().toLowerCase().replace(/^#/, '')
-
-  const filtered = requests.filter((request) => {
-    if (filters.status !== 'all' && request.status !== filters.status) return false
-    if (filters.priority !== 'all' && request.priority !== filters.priority) return false
-
-    if (filters.assignee === 'none' && request.assignee !== null) return false
-    if (
-      filters.assignee !== 'all' &&
-      filters.assignee !== 'none' &&
-      request.assignee !== filters.assignee
-    ) {
-      return false
-    }
-
-    if (!query) return true
-
-    return (
-      String(request.number).includes(query) ||
-      request.title.toLowerCase().includes(query) ||
-      request.client.toLowerCase().includes(query) ||
-      (request.assignee?.toLowerCase().includes(query) ?? false)
-    )
-  })
-
-  return sortRequests(filtered, filters.sort)
-}
-
-export function sortRequests(requests: SupportRequest[], sort: RequestSort): SupportRequest[] {
-  const copy = [...requests]
-
-  switch (sort) {
-    case 'oldest':
-      return copy.sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      )
-    case 'priority':
-      return copy.sort((a, b) => {
-        const rank = PRIORITY_META[a.priority].rank - PRIORITY_META[b.priority].rank
-        if (rank !== 0) return rank
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      })
-    case 'newest':
-    default:
-      return copy.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
-  }
-}
-
-export function paginate<T>(items: T[], page: number, perPage: number): T[] {
-  const start = Math.max(0, (page - 1) * perPage)
-  return items.slice(start, start + perPage)
-}
-
 export interface RequestStats {
   new: number
   active: number
   waiting: number
   resolved: number
-}
-
-export function getRequestStats(requests: SupportRequest[]): RequestStats {
-  return {
-    new: requests.filter((request) => request.status === 'new').length,
-    active: requests.filter(
-      (request) =>
-        request.status === 'assigned' || request.status === 'in-progress',
-    ).length,
-    waiting: requests.filter((request) => request.status === 'waiting').length,
-    resolved: requests.filter((request) => request.status === 'resolved').length,
-  }
-}
-
-export function calculateDueAt(createdAt: string, priority: RequestPriority): string {
-  const slaHours: Record<RequestPriority, number> = {
-    critical: 4,
-    high: 8,
-    normal: 24,
-    low: 48,
-  }
-
-  return new Date(new Date(createdAt).getTime() + slaHours[priority] * 60 * 60 * 1000).toISOString()
 }
 
 export function isOverdue(dueAt: string, status: RequestStatus): boolean {

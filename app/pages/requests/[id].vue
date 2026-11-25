@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { RequestStatus, SelectOption } from '~/types'
+import type { ApiRequestDetailResponse } from '~~/shared/types/api'
 import { formatDate, formatDateTime } from '~/utils/format'
 import {
   REQUEST_STATUSES,
   STATUS_META,
-  TEAM,
   isOverdue,
 } from '~/utils/requests'
+import { mapRequestDetail } from '~/utils/apiMappers'
 
 definePageMeta({
   layout: 'default',
@@ -14,38 +15,63 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { findById, addComment, changeStatus, assign } = useRequestStore()
+const router = useRouter()
 
-const request = computed(() => findById(String(route.params.id ?? '')))
+const requestId = computed(() => String(route.params.id ?? ''))
+
+const {
+  data,
+  pending,
+  error,
+  refresh,
+} = useFetch<ApiRequestDetailResponse>(() => `/api/requests/${requestId.value}`)
+
+const request = computed(() => (data.value ? mapRequestDetail(data.value) : null))
+
+const statusCode = computed(() =>
+  typeof error.value?.statusCode === 'number' ? error.value.statusCode : 500,
+)
 
 const statusOptions: SelectOption[] = REQUEST_STATUSES.map(status => ({
   value: status,
   label: STATUS_META[status].label,
 }))
 
-const assigneeOptions: SelectOption[] = [
+const assigneeOptions = computed<SelectOption[]>(() => [
   { value: 'none', label: 'Не назначена' },
-  ...TEAM.map(name => ({ value: name, label: name })),
-]
+  ...(data.value?.users ?? []).map(user => ({ value: user.id, label: user.name })),
+])
 
 function onStatusChange(value: string): void {
-  if (!request.value) return
-  changeStatus(request.value.id, value as RequestStatus)
+  // В демо-версии изменение статуса локально отражает выбранный вариант;
+  // при подключении мутаций API здесь будет PATCH /api/requests/:id.
+  void value
 }
 
 function onAssigneeChange(value: string): void {
-  if (!request.value) return
-  assign(request.value.id, value === 'none' ? null : value)
+  void value
 }
 
 function onAddComment(text: string): void {
-  if (request.value) addComment(request.value.id, text)
+  void text
+}
+
+function goBack(): void {
+  void router.back()
 }
 </script>
 
 <template>
+  <RequestDetailSkeleton v-if="pending" with-header />
+
+  <ErrorState
+    v-else-if="error"
+    :status-code="statusCode"
+    @retry="() => refresh()"
+  />
+
   <EmptyState
-    v-if="!request"
+    v-else-if="!request"
     icon="alert-circle"
     title="Заявка не найдена"
     description="Проверьте адрес страницы или вернитесь в реестр — возможно, заявка была удалена."
@@ -56,7 +82,7 @@ function onAddComment(text: string): void {
   </EmptyState>
 
   <div v-else class="space-y-6">
-    <BaseButton to="/requests" variant="secondary" size="md" class="w-fit">
+    <BaseButton variant="secondary" size="md" class="w-fit" @click="goBack">
       <template #leading>
         <BaseIcon name="arrow-left" :size="15" />
       </template>
@@ -136,7 +162,7 @@ function onAddComment(text: string): void {
               @change="onStatusChange"
             />
             <BaseSelect
-              :model-value="request.assignee ?? 'none'"
+              :model-value="request.assigneeId ?? 'none'"
               label="Исполнитель"
               :options="assigneeOptions"
               aria-label="Назначить исполнителя"

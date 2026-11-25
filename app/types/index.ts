@@ -43,6 +43,8 @@ export interface SupportRequest {
   title: string
   client: string
   assignee: string | null
+  /** id исполнителя из API — нужен для селекта «Исполнитель». */
+  assigneeId: string | null
   status: RequestStatus
   priority: RequestPriority
   category: string

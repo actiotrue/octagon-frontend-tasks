@@ -1,22 +1,26 @@
 <script setup lang="ts">
 import type { RequestFilters, RequestPriority, RequestStatus, RequestSort, SelectOption } from '~/types'
+import type { ApiUser } from '~~/shared/types/api'
 import {
   DEFAULT_FILTERS,
   PRIORITY_FILTER_OPTIONS,
   SORT_OPTIONS,
   STATUS_FILTER_OPTIONS,
-  TEAM,
   hasActiveFilters,
 } from '~/utils/requests'
+
+const props = defineProps<{
+  users?: ApiUser[]
+}>()
 
 const model = defineModel<RequestFilters>({ required: true })
 const emit = defineEmits<{ reset: [] }>()
 
-const assigneeOptions: SelectOption[] = [
+const assigneeOptions = computed<SelectOption[]>(() => [
   { value: 'all', label: 'Все исполнители' },
   { value: 'none', label: 'Не назначена' },
-  ...TEAM.map(name => ({ value: name, label: name })),
-]
+  ...(props.users ?? []).map(user => ({ value: user.id, label: user.name })),
+])
 
 const active = computed(() => hasActiveFilters(model.value))
 

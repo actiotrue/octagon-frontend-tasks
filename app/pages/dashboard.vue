@@ -1,27 +1,39 @@
 <script setup lang="ts">
-import type { NewRequestInput } from '~/types'
-import { getRequestStats } from '~/utils/requests'
+import type { ApiRequestListResponse } from '~~/shared/types/api'
+import { createLookup, mapRequest } from '~/utils/apiMappers'
 
 definePageMeta({
   layout: 'default',
   title: 'Обзор',
 })
 
-const { requests, createRequest } = useRequestStore()
+const RECENT_LIMIT = 3
 
-const stats = computed(() => getRequestStats(requests.value))
-const recent = computed(() =>
-  [...requests.value]
-    .sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
-    .slice(0, 3),
+// Сводка по всем заявкам — с сервера.
+const { data: stats, pending: statsPending } = useFetch('/api/stats')
+
+// Последние заявки.
+const {
+  data,
+  pending,
+  error,
+  refresh,
+} = useFetch<ApiRequestListResponse>('/api/requests', {
+  query: { sort: 'newest', limit: RECENT_LIMIT },
+})
+
+const recent = computed(() => {
+  const payload = data.value
+  if (!payload) return []
+  const lookup = createLookup(payload.users, payload.customers, payload.categories)
+  return payload.items.map(request => mapRequest(request, lookup))
+})
+
+const statusCode = computed(() =>
+  typeof error.value?.statusCode === 'number' ? error.value.statusCode : 500,
 )
 
-const createModalOpen = ref(false)
-
-async function handleCreate(input: NewRequestInput): Promise<void> {
-  const created = createRequest(input)
-  await navigateTo(`/requests/${created.id}`)
-}
+const emptyStats = { new: 0, active: 0, waiting: 0, resolved: 0 }
 </script>
 
 <template>
@@ -31,7 +43,9 @@ async function handleCreate(input: NewRequestInput): Promise<void> {
       description="Обзор работы поддержки"
     />
 
-    <StatsGrid :stats="stats" />
+    <div :aria-busy="statsPending">
+      <StatsGrid :stats="stats ?? emptyStats" />
+    </div>
 
     <section aria-labelledby="recent-title" class="space-y-4">
       <h2 id="recent-title" class="text-xl font-bold tracking-[-0.01em] text-white">
@@ -44,10 +58,12 @@ async function handleCreate(input: NewRequestInput): Promise<void> {
 
       <RequestList
         :requests="recent"
+        :pending="pending"
+        :error="!!error"
+        :status-code="statusCode"
+        @retry="() => refresh()"
         @reset="() => {}"
       />
     </section>
-
-    <NewRequestModal v-model:open="createModalOpen" @create="handleCreate" />
   </div>
 </template>
