@@ -1,0 +1,223 @@
+@import "tailwindcss";
+@import "@fontsource-variable/montserrat";
+
+/*
+  Дизайн-токены из макета Figma (Octagon WorkFlow).
+  Все компоненты ссылаются только на эти переменные.
+*/
+:root {
+  /* Цвета */
+  --octagon-color-bg-canvas: #17153a;
+  --octagon-color-bg-surface: #23204d;
+  --octagon-color-bg-subtle: #2f2a6a;
+  --octagon-color-bg-accent-soft: #302b69;
+
+  --octagon-color-border-default: #413e74;
+  --octagon-color-border-strong: #615b94;
+  --octagon-color-border-field: #413e74;
+  --octagon-color-border-field-hover: #7066b2;
+  --octagon-color-border-field-disabled: #383661;
+
+  --octagon-color-text-primary: #e8e7ec;
+  --octagon-color-text-secondary: #b9b3d4;
+  --octagon-color-text-muted: #8e88a8;
+  --octagon-color-text-disabled: #8e88a8;
+  --octagon-color-text-inverse: #ffffff;
+  --octagon-color-text-accent: #79cee8;
+
+  --octagon-color-action-from: #635bff;
+  --octagon-color-action-to: #c548ab;
+  --octagon-color-focus-ring: #635bff;
+
+  /* Статусы */
+  --octagon-status-new-bg: #353060;
+  --octagon-status-new-fg: #bbb6ff;
+  --octagon-status-assigned-bg: #203f57;
+  --octagon-status-assigned-fg: #79cee8;
+  --octagon-status-in-progress-bg: #443955;
+  --octagon-status-in-progress-fg: #ffd482;
+  --octagon-status-waiting-bg: #37324e;
+  --octagon-status-waiting-fg: #c8c3de;
+  --octagon-status-escalated-bg: #492940;
+  --octagon-status-escalated-fg: #ff91ae;
+  --octagon-status-resolved-bg: #214544;
+  --octagon-status-resolved-fg: #80e1b3;
+  --octagon-status-closed-bg: #37324e;
+  --octagon-status-closed-fg: #bfb9d6;
+
+  /* Приоритеты */
+  --octagon-priority-critical: #ff91ae;
+  --octagon-priority-high: #ffd482;
+  --octagon-priority-normal: #bbb6ff;
+  --octagon-priority-low: #b9b3d4;
+
+  /* Радиусы и отступы */
+  --octagon-radius-sm: 4px;
+  --octagon-radius-md: 4px;
+  --octagon-radius-lg: 8px;
+  --octagon-radius-full: 999px;
+
+  --octagon-spacing-xs: 4px;
+  --octagon-spacing-sm: 8px;
+  --octagon-spacing-md: 12px;
+  --octagon-spacing-lg: 16px;
+  --octagon-spacing-xl: 24px;
+  --octagon-spacing-2xl: 32px;
+  --octagon-spacing-3xl: 64px;
+
+  --octagon-color-overlay: #0b0920;
+
+  --octagon-color-bg-sidebar: #17153a;
+  --octagon-color-text-sidebar: #c8c3de;
+}
+
+@theme {
+  --font-sans: "Montserrat Variable", "Montserrat", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Маппинг токенов макета на Tailwind-цвета */
+  --color-canvas: var(--octagon-color-bg-canvas);
+  --color-panel: var(--octagon-color-bg-surface);
+  --color-panel-strong: var(--octagon-color-bg-subtle);
+  --color-line: var(--octagon-color-border-default);
+  --color-line-strong: var(--octagon-color-border-strong);
+  --color-ink: var(--octagon-color-text-primary);
+  --color-muted: var(--octagon-color-text-secondary);
+  --color-subtle: var(--octagon-color-text-muted);
+  --color-accent: var(--octagon-color-text-accent);
+  --color-action-from: var(--octagon-color-action-from);
+  --color-action-to: var(--octagon-color-action-to);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    background-image: radial-gradient(1150px circle at 55% 50%, #201d47 0%, var(--octagon-color-bg-canvas) 70%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--octagon-color-action-from) 45%, transparent);
+    color: #fff;
+  }
+
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-[1216px] px-4 sm:px-8;
+  }
+
+  .panel {
+    @apply rounded-[var(--octagon-radius-md)] border border-line bg-panel;
+  }
+
+  /* Унифицированное focus-кольцо по макету: белая обводка + фиолетовый ореол */
+  .focus-ring {
+    outline: none;
+  }
+
+  .focus-ring:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--octagon-color-text-inverse),
+      0 0 0 4px var(--octagon-color-focus-ring);
+  }
+}
+
+.skip-link {
+  @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-canvas;
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(5px);
+}
+
+.page-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 180ms ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .modal-panel,
+.modal-leave-active .modal-panel {
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease;
+}
+
+.modal-enter-from .modal-panel,
+.modal-leave-to .modal-panel {
+  opacity: 0;
+  transform: translateY(14px) scale(0.985);
+}
+
+.drawer-enter-active,
+.drawer-leave-active {
+  transition: opacity 200ms ease;
+}
+
+.drawer-enter-from,
+.drawer-leave-to {
+  opacity: 0;
+}
+
+.drawer-enter-active .drawer-panel,
+.drawer-leave-active .drawer-panel {
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.drawer-enter-from .drawer-panel,
+.drawer-leave-to .drawer-panel {
+  transform: translateX(100%);
+}
+
+details > summary {
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
