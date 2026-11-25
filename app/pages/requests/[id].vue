@@ -15,7 +15,6 @@ definePageMeta({
 
 const route = useRoute()
 const { findById, addComment, changeStatus, assign } = useRequestStore()
-const { scenario, setScenario } = useMockScenario()
 
 const request = computed(() => findById(String(route.params.id ?? '')))
 
@@ -45,17 +44,8 @@ function onAddComment(text: string): void {
 </script>
 
 <template>
-  <RequestDetailSkeleton v-if="scenario === 'loading'" />
-
-  <ErrorState
-    v-else-if="scenario === 'error'"
-    title="Не удалось загрузить заявку"
-    description="Демо-сценарий ошибки активен. Повторите попытку или вернитесь к обычным данным."
-    @retry="setScenario('normal')"
-  />
-
   <EmptyState
-    v-else-if="!request"
+    v-if="!request"
     icon="alert-circle"
     title="Заявка не найдена"
     description="Проверьте адрес страницы или вернитесь в реестр — возможно, заявка была удалена."
@@ -161,15 +151,5 @@ function onAddComment(text: string): void {
         </section>
       </aside>
     </div>
-
-    <section class="flex flex-col gap-4 rounded-[var(--octagon-radius-md)] border border-line bg-panel/50 p-4 sm:flex-row sm:items-center sm:justify-between">
-      <p class="text-xs text-subtle">
-        Проверьте состояния загрузки и ошибки для карточки заявки.
-      </p>
-      <MockStateSwitcher
-        :model-value="scenario"
-        @update:model-value="value => setScenario(value)"
-      />
-    </section>
   </div>
 </template>

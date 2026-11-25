@@ -8,7 +8,6 @@ definePageMeta({
 })
 
 const { requests, createRequest } = useRequestStore()
-const { scenario, setScenario } = useMockScenario()
 
 const stats = computed(() => getRequestStats(requests.value))
 const recent = computed(() =>
@@ -45,22 +44,7 @@ async function handleCreate(input: NewRequestInput): Promise<void> {
 
       <RequestList
         :requests="recent"
-        :scenario="scenario"
-        @retry="setScenario('normal')"
-        @reset="setScenario('normal')"
-      />
-    </section>
-
-    <section class="flex flex-col gap-4 rounded-[var(--octagon-radius-md)] border border-line bg-panel/50 p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div class="min-w-0">
-        <p class="text-sm font-medium text-ink">Демо-состояния данных</p>
-        <p class="mt-1 text-xs text-subtle">
-          Переключите сценарий, чтобы проверить загрузку, пустой список и ошибку.
-        </p>
-      </div>
-      <MockStateSwitcher
-        :model-value="scenario"
-        @update:model-value="value => setScenario(value)"
+        @reset="() => {}"
       />
     </section>
 

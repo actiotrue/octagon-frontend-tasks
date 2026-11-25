@@ -2,7 +2,6 @@
 import type { NavLink } from '~/types'
 
 const route = useRoute()
-const menuOpen = ref(false)
 const isLogin = computed(() => route.path === '/login')
 
 const links: NavLink[] = [
@@ -34,36 +33,16 @@ const links: NavLink[] = [
           </NuxtLink>
         </nav>
 
-        <div class="flex items-center gap-2">
+        <div class="ml-auto flex items-center gap-2 md:ml-0">
           <BaseButton
             to="/login"
             variant="secondary"
             size="sm"
-            class="hidden sm:inline-flex"
           >
             Войти
           </BaseButton>
-
-          <button
-            type="button"
-            class="inline-flex size-9 items-center justify-center rounded-lg border border-line text-[var(--octagon-color-text-secondary)] transition hover:border-[var(--octagon-color-border-strong)] hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--octagon-color-focus-ring)] md:hidden"
-            aria-label="Открыть меню"
-            aria-haspopup="dialog"
-            :aria-expanded="menuOpen"
-            @click="menuOpen = true"
-          >
-            <BaseIcon name="menu" :size="19" />
-          </button>
         </div>
       </template>
     </div>
-
-    <AppDrawer v-model:open="menuOpen" :links="links">
-      <template #footer>
-        <BaseButton to="/login" block @click="menuOpen = false">
-          Войти
-        </BaseButton>
-      </template>
-    </AppDrawer>
   </header>
 </template>

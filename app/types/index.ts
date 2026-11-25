@@ -11,8 +11,6 @@ export type RequestPriority = 'critical' | 'high' | 'normal' | 'low'
 
 export type RequestSort = 'newest' | 'oldest' | 'priority'
 
-export type MockScenario = 'normal' | 'loading' | 'empty' | 'error'
-
 export interface RequestComment {
   id: string
   author: string

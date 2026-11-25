@@ -19,7 +19,6 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 const { requests, createRequest } = useRequestStore()
-const { scenario, setScenario } = useMockScenario()
 
 const PER_PAGE = 12
 
@@ -59,7 +58,6 @@ function buildQuery(): Record<string, string | null> {
     assignee: filters.value.assignee === 'all' ? null : filters.value.assignee,
     sort: filters.value.sort === 'newest' ? null : filters.value.sort,
     page: page.value > 1 ? String(page.value) : null,
-    state: typeof route.query.state === 'string' ? route.query.state : null,
   }
 }
 
@@ -121,14 +119,12 @@ async function handleCreate(input: NewRequestInput): Promise<void> {
 
     <RequestList
       :requests="visibleRequests"
-      :scenario="scenario"
       :has-active-filters="activeFilters"
-      @retry="setScenario('normal')"
       @reset="resetFilters"
     />
 
     <PaginationBar
-      v-if="scenario === 'normal' && filtered.length > 0"
+      v-if="filtered.length > 0"
       :page="safePage"
       :page-count="pageCount"
       :total="filtered.length"
@@ -136,19 +132,6 @@ async function handleCreate(input: NewRequestInput): Promise<void> {
       :to="to"
       @update:page="value => page = value"
     />
-
-    <section class="flex flex-col gap-4 rounded-xl border border-line bg-panel/50 p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div class="min-w-0">
-        <p class="text-sm font-medium text-ink">Демо-состояния списка</p>
-        <p class="mt-1 text-xs text-subtle">
-          Проверьте загрузку, пустой реестр и ошибку — состояние добавляется в URL.
-        </p>
-      </div>
-      <MockStateSwitcher
-        :model-value="scenario"
-        @update:model-value="value => setScenario(value)"
-      />
-    </section>
 
     <NewRequestModal v-model:open="createModalOpen" @create="handleCreate" />
   </div>
