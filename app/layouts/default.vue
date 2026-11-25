@@ -6,10 +6,8 @@ const { user } = useAuth()
 const menuOpen = ref(false)
 
 const links: NavLink[] = [
-  { label: 'Главная', to: '/' },
-  { label: 'Дашборд', to: '/dashboard' },
-  { label: 'Заявки', to: '/requests' },
-  { label: 'Профиль', to: '/profile' },
+  { label: 'Обзор', to: '/dashboard' },
+  { label: 'Заявки', to: '/requests' }
 ]
 
 const currentTitle = computed(() => {
@@ -43,10 +41,6 @@ watch(
 
           <SiteLogo />
 
-          <span class="hidden items-center gap-2 border-l border-line pl-3 text-xs text-subtle md:inline-flex">
-            <BaseIcon name="shield" :size="14" class="text-[var(--octagon-status-new-fg)]" />
-            {{ currentTitle }}
-          </span>
         </div>
 
         <nav class="hidden items-center gap-1 lg:flex" aria-label="Основная навигация">
