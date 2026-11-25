@@ -47,7 +47,6 @@ const faqs = [
 
 <template>
   <div>
-    <!-- Первый экран -->
     <section class="bg-[var(--octagon-color-bg-sidebar,#17153a)]">
       <div class="container-page flex flex-col gap-6 py-16 lg:py-24">
         <div class="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -74,7 +73,6 @@ const faqs = [
           >
         </div>
 
-        <!-- Пример рабочего процесса -->
         <div class="grid gap-4 sm:grid-cols-3">
           <div
             v-for="step in steps"
