@@ -4,7 +4,7 @@
 
 ## Стек
 
-- **Nuxt 4** (SSR), Vue 3, TypeScript
+- **Nuxt 4** (SSR), Vue 3, TypeScript, Pinia (состояние)
 
 ## Запуск
 
@@ -35,7 +35,7 @@ pnpm dev
 | `/login` | Вход с валидацией и показом пароля |
 | `/dashboard` | Обзор: 4 показателя и последние заявки |
 | `/requests` | Список заявок: поиск, фильтры, сортировка, пагинация |
-| `/requests/:id` | Карточка заявки: описание, комментарии, история, параметры |
+| `/requests/:id` | Карточка заявки: описание, комментарии, история, параметры (статус/приоритет/исполнитель с optimistic update и Undo) |
 | `/profile` | Профиль: данные, настройки интерфейса, выход |
 
 ## Структура проекта
@@ -48,11 +48,12 @@ app/
   layouts/                   default (app) и public (лендинг/вход)
   middleware/auth.global.ts  защита приватных маршрутов
   pages/                     страницы приложения
+  stores/                    Pinia: requests (server state), preferences (app state), requestUi (баннеры)
   types/                     доменные типы
   utils/                     apiMappers (API → доменные модели), форматирование
   error.vue                  кастомная страница 404/500
 server/
-  api/                       requests (GET/POST, :id), users, customers, categories, stats
+  api/                       requests (GET/POST/PATCH, :id, comments), users, customers, categories, stats
   utils/                     db (хранилище в памяти), priority
 shared/
   types/api.ts               TypeScript-модели API (контракт клиент ⇆ сервер)

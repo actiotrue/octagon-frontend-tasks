@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ApiRequestListResponse } from '~~/shared/types/api'
 import { createLookup, mapRequest } from '~/utils/apiMappers'
+import { useRequestsStore } from '~/stores/requests'
 
 definePageMeta({
   layout: 'default',
@@ -20,6 +21,13 @@ const {
   refresh,
 } = useFetch<ApiRequestListResponse>('/api/requests', {
   query: { sort: 'newest', limit: RECENT_LIMIT },
+  key: 'dashboard-recent',
+})
+
+const requestsStore = useRequestsStore()
+
+watchEffect(() => {
+  if (data.value) requestsStore.setList(data.value)
 })
 
 const recent = computed(() => {

@@ -53,6 +53,7 @@ const links: NavLink[] = [
     </header>
 
     <main id="main" class="container-page w-full flex-1 py-8 sm:py-10">
+      <RequestBanner />
       <slot />
     </main>
 

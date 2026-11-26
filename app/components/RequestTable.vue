@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import type { SupportRequest } from '~/types'
+import { usePreferencesStore } from '~/stores/preferences'
 
 defineProps<{
   requests: SupportRequest[]
 }>()
+
+// Плотность списка — app state из preferences store (макет 3.10).
+const { listDensity } = storeToRefs(usePreferencesStore())
+
+const rowPad = computed(() =>
+  listDensity.value === 'compact' ? 'py-1.5' : 'py-3.5',
+)
 </script>
 
 <template>
@@ -29,7 +37,7 @@ defineProps<{
             :key="request.id"
             class="border-t border-white/[0.06] transition-colors hover:bg-[var(--octagon-color-bg-accent-soft)]"
           >
-            <td class="px-4 py-3.5 align-middle">
+            <td class="px-4 align-middle" :class="rowPad">
               <NuxtLink
                 :to="`/requests/${request.id}`"
                 class="rounded text-xs tabular-nums text-[var(--octagon-color-text-secondary)] transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--octagon-color-focus-ring)]"
@@ -38,27 +46,28 @@ defineProps<{
                 #{{ request.number }}
               </NuxtLink>
             </td>
-            <td class="min-w-0 px-4 py-3.5 align-middle">
+            <td class="min-w-0 px-4 align-middle" :class="rowPad">
               <NuxtLink
                 :to="`/requests/${request.id}`"
                 class="line-clamp-2 rounded text-sm font-medium text-ink transition hover:text-white hover:underline hover:underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--octagon-color-focus-ring)]"
+                :class="listDensity === 'compact' ? 'line-clamp-1' : 'line-clamp-2'"
               >
                 {{ request.title }}
               </NuxtLink>
             </td>
-            <td class="hidden truncate px-4 py-3.5 align-middle text-xs text-[var(--octagon-color-text-secondary)] lg:table-cell">
+            <td class="hidden truncate px-4 align-middle text-xs text-[var(--octagon-color-text-secondary)] lg:table-cell" :class="rowPad">
               {{ request.client }}
             </td>
             <td
-              class="hidden truncate px-4 py-3.5 align-middle text-xs xl:table-cell"
-              :class="request.assignee ? 'text-[var(--octagon-color-text-secondary)]' : 'text-subtle'"
+              class="hidden truncate px-4 align-middle text-xs xl:table-cell"
+              :class="[rowPad, request.assignee ? 'text-[var(--octagon-color-text-secondary)]' : 'text-subtle']"
             >
               {{ request.assignee ?? 'Не назначен' }}
             </td>
-            <td class="px-4 py-3.5 align-middle">
+            <td class="px-4 align-middle" :class="rowPad">
               <StatusBadge :status="request.status" size="sm" />
             </td>
-            <td class="px-4 py-3.5 align-middle">
+            <td class="px-4 align-middle" :class="rowPad">
               <PriorityBadge :priority="request.priority" />
             </td>
           </tr>

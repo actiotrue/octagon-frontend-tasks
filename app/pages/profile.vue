@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SelectOption } from '~/types'
+import { usePreferencesStore, type ListDensity } from '~/stores/preferences'
 
 definePageMeta({
   layout: 'default',
@@ -7,6 +8,7 @@ definePageMeta({
 })
 
 const { user, updateProfile, logout } = useAuth()
+const preferences = usePreferencesStore()
 
 const form = reactive({
   name: user.value?.name ?? '',
@@ -14,12 +16,16 @@ const form = reactive({
 })
 
 const saved = ref(false)
-const density = ref('comfortable')
 
 const densityOptions: SelectOption[] = [
   { value: 'comfortable', label: 'Комфортная' },
   { value: 'compact', label: 'Компактная' },
 ]
+
+const density = computed<ListDensity>({
+  get: () => preferences.listDensity,
+  set: value => preferences.setListDensity(value),
+})
 
 watch(user, (value) => {
   if (!value) return

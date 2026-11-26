@@ -10,6 +10,7 @@ import {
   parseStatusFilter,
 } from '~/utils/requests'
 import { createLookup, mapRequest } from '~/utils/apiMappers'
+import { useRequestsStore } from '~/stores/requests'
 
 definePageMeta({
   layout: 'default',
@@ -60,9 +61,16 @@ const {
 } = useFetch<ApiRequestListResponse>('/api/requests', {
   query: apiQuery,
   watch: [apiQuery],
+  key: 'requests-list',
 })
 
 const directories = useDirectories()
+const requestsStore = useRequestsStore()
+
+// Список уходит в store — единый источник заявок для мутаций и Undo-баннера.
+watchEffect(() => {
+  if (data.value) requestsStore.setList(data.value)
+})
 
 const requests = computed(() => {
   const payload = data.value
